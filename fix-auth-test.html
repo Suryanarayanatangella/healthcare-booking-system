@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+</head>
+<body>
+    <h1>Healthcare Booking - Authentication Test</h1>
+    
+    <div>
+        <h2>Clear Storage & Test Login</h2>
+        <button onclick="clearStorage()">Clear LocalStorage</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testAuthMe()">Test Auth Me</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const baseUrl = 'http://localhost:5000/api';
+        
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('results').innerHTML = '<p>✅ LocalStorage cleared</p>';
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${baseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'patient@demo.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    document.getElementById('results').innerHTML = `
+                        <p>✅ Login successful!</p>
+                        <p>Token: ${data.token}</p>
+                        <p>User: ${data.user.firstName} ${data.user.lastName}</p>
+                    `;
+                } else {
+                    document.getElementById('results').innerHTML = `<p>❌ Login failed: ${data.message}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>❌ Login error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testAuthMe() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    document.getElementById('results').innerHTML = '<p>❌ No token found. Please login first.</p>';
+                    return;
+                }
+                
+                const response = await fetch(`${baseUrl}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('results').innerHTML = `
+                        <p>✅ Auth Me successful!</p>
+                        <p>User: ${data.user.firstName} ${data.user.lastName}</p>
+                        <p>Role: ${data.user.role}</p>
+                    `;
+                } else {
+                    document.getElementById('results').innerHTML = `<p>❌ Auth Me failed: ${data.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `<p>❌ Auth Me error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

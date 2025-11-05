@@ -1,0 +1,63 @@
+{
+  "name": "healthcare-booking-system",
+  "version": "1.0.0",
+  "description": "A modern, full-stack healthcare appointment booking platform",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --run",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:vercel": "bash scripts/deploy.sh --vercel",
+    "deploy:railway": "bash scripts/deploy.sh --railway",
+    "deploy:frontend": "bash scripts/deploy.sh --frontend-only",
+    "deploy:backend": "bash scripts/deploy.sh --backend-only",
+    "health-check": "bash scripts/deploy.sh --health-check",
+    "setup-db": "bash scripts/deploy.sh --setup-db"
+  },
+  "keywords": [
+    "healthcare",
+    "appointment",
+    "booking",
+    "react",
+    "nodejs",
+    "postgresql",
+    "medical",
+    "doctor",
+    "patient"
+  ],
+  "author": "Healthcare Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/healthcare-booking-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/healthcare-booking-system/issues"
+  },
+  "homepage": "https://github.com/yourusername/healthcare-booking-system#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}

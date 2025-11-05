@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <!-- Main gradient background -->
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Overlay gradient -->
+    <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:0.6" />
+    </linearGradient>
+    
+    <!-- Pattern definitions -->
+    <pattern id="medicalPattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <rect width="200" height="200" fill="none"/>
+      <!-- Medical crosses -->
+      <g opacity="0.1">
+        <rect x="90" y="70" width="20" height="60" fill="white" rx="2"/>
+        <rect x="70" y="90" width="60" height="20" fill="white" rx="2"/>
+      </g>
+      <g opacity="0.08" transform="translate(100, 100)">
+        <rect x="90" y="70" width="15" height="45" fill="white" rx="1"/>
+        <rect x="70" y="90" width="45" height="15" fill="white" rx="1"/>
+      </g>
+    </pattern>
+    
+    <!-- Floating elements pattern -->
+    <pattern id="floatingElements" x="0" y="0" width="300" height="300" patternUnits="userSpaceOnUse">
+      <rect width="300" height="300" fill="none"/>
+      <!-- Stethoscope shapes -->
+      <g opacity="0.06" fill="white">
+        <circle cx="50" cy="50" r="8"/>
+        <circle cx="250" cy="150" r="6"/>
+        <circle cx="150" cy="250" r="10"/>
+        <path d="M50 50 Q80 30 100 50 Q120 70 100 90 Q80 110 50 90" fill="none" stroke="white" stroke-width="2"/>
+      </g>
+      <!-- Heart shapes -->
+      <g opacity="0.05" fill="white">
+        <path d="M200 80 C200 70, 190 60, 180 60 C170 60, 160 70, 160 80 C160 70, 150 60, 140 60 C130 60, 120 70, 120 80 C120 100, 160 120, 160 120 S200 100, 200 80 Z" transform="scale(0.5)"/>
+        <path d="M100 200 C100 190, 90 180, 80 180 C70 180, 60 190, 60 200 C60 190, 50 180, 40 180 C30 180, 20 190, 20 200 C20 220, 60 240, 60 240 S100 220, 100 200 Z" transform="scale(0.3)"/>
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="1920" height="1080" fill="url(#heroGradient)"/>
+  
+  <!-- Overlay -->
+  <rect width="1920" height="1080" fill="url(#overlayGradient)"/>
+  
+  <!-- Medical pattern overlay -->
+  <rect width="1920" height="1080" fill="url(#medicalPattern)"/>
+  
+  <!-- Floating elements -->
+  <rect width="1920" height="1080" fill="url(#floatingElements)"/>
+  
+  <!-- Abstract medical shapes -->
+  <g opacity="0.1">
+    <!-- Large medical cross -->
+    <g transform="translate(1600, 200)">
+      <rect x="-30" y="-80" width="60" height="160" fill="white" rx="8"/>
+      <rect x="-80" y="-30" width="160" height="60" fill="white" rx="8"/>
+    </g>
+    
+    <!-- Stethoscope outline -->
+    <g transform="translate(200, 800)" fill="none" stroke="white" stroke-width="4" opacity="0.15">
+      <circle cx="0" cy="0" r="25"/>
+      <path d="M0 25 Q50 50 100 25 Q150 0 200 25"/>
+      <path d="M200 25 L250 75 Q270 95 250 115 Q230 135 210 115 L160 65"/>
+    </g>
+    
+    <!-- Heart monitor line -->
+    <g transform="translate(0, 400)" fill="none" stroke="white" stroke-width="3" opacity="0.1">
+      <path d="M0 0 L200 0 L250 -50 L300 50 L350 -30 L400 30 L450 0 L1920 0"/>
+    </g>
+  </g>
+  
+  <!-- Subtle geometric shapes -->
+  <g opacity="0.08" fill="white">
+    <circle cx="1700" cy="900" r="120"/>
+    <circle cx="100" cy="200" r="80"/>
+    <circle cx="1800" cy="100" r="60"/>
+    <rect x="50" y="950" width="100" height="100" rx="20"/>
+    <rect x="1750" y="750" width="80" height="80" rx="15"/>
+  </g>
+</svg>
