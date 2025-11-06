@@ -7,15 +7,15 @@
 
 const express = require('express');
 const Joi = require('joi');
-const { query, getClient } = require('../config/database');
+const { database, getClient } = require('../config/database');
 const { requireRole } = require('../middleware/auth');
-const { sendAppointmentConfirmation, sendAppointmentCancellation } = require('../utils/emailService');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 
 // Validation schemas
 const bookAppointmentSchema = Joi.object({
-  doctorId: Joi.string().uuid().required(),
+  doctorId: Joi.number().integer().positive().required(),
   appointmentDate: Joi.date().min('now').required(),
   appointmentTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required(),
   reasonForVisit: Joi.string().max(500).optional()
@@ -35,8 +35,6 @@ const updateAppointmentSchema = Joi.object({
  * @access  Private (Patient only)
  */
 router.post('/', requireRole(['patient']), async (req, res, next) => {
-  const client = await getClient();
-  
   try {
     // Validate request body
     const { error, value } = bookAppointmentSchema.validate(req.body);
@@ -50,45 +48,28 @@ router.post('/', requireRole(['patient']), async (req, res, next) => {
     const { doctorId, appointmentDate, appointmentTime, reasonForVisit } = value;
     const userId = req.user.id;
 
-    await client.query('BEGIN');
-
-    // Get patient ID
-    const patientResult = await client.query(
-      'SELECT id FROM patients WHERE user_id = $1',
-      [userId]
-    );
-
-    if (patientResult.rows.length === 0) {
-      await client.query('ROLLBACK');
+    // Get patient ID using database wrapper
+    const patient = await database.getPatientByUserId(userId);
+    if (!patient) {
       return res.status(404).json({
-        error: 'Patient not found',
-        message: 'Patient profile not found'
+        error: 'Patient profile required',
+        message: 'Patient profile not found. Please contact support or try registering again with complete patient information.',
+        suggestion: 'Make sure you registered as a patient and provided all required information including date of birth, address, and emergency contact details.'
       });
     }
 
-    const patientId = patientResult.rows[0].id;
+    const patientId = patient.id;
 
     // Verify doctor exists and is available
-    const doctorResult = await client.query(
-      `SELECT d.id, d.is_available, u.first_name, u.last_name, u.email
-       FROM doctors d
-       JOIN users u ON d.user_id = u.id
-       WHERE d.id = $1 AND u.is_active = true`,
-      [doctorId]
-    );
-
-    if (doctorResult.rows.length === 0) {
-      await client.query('ROLLBACK');
+    const doctor = await database.getDoctorById(doctorId);
+    if (!doctor) {
       return res.status(404).json({
         error: 'Doctor not found',
         message: 'Doctor not found or not available'
       });
     }
 
-    const doctor = doctorResult.rows[0];
-
     if (!doctor.is_available) {
-      await client.query('ROLLBACK');
       return res.status(400).json({
         error: 'Doctor unavailable',
         message: 'Doctor is currently not accepting appointments'
@@ -96,75 +77,57 @@ router.post('/', requireRole(['patient']), async (req, res, next) => {
     }
 
     // Check if the time slot is available (prevent double booking)
-    const existingAppointment = await client.query(
-      `SELECT id FROM appointments 
-       WHERE doctor_id = $1 AND appointment_date = $2 AND appointment_time = $3 
-       AND status NOT IN ('cancelled')`,
-      [doctorId, appointmentDate, appointmentTime]
+    const existingAppointments = await database.getAppointmentsByDoctorId(doctorId);
+    const conflictingAppointment = existingAppointments.find(apt => 
+      apt.appointment_date === appointmentDate && 
+      apt.appointment_time === appointmentTime && 
+      apt.status !== 'cancelled'
     );
 
-    if (existingAppointment.rows.length > 0) {
-      await client.query('ROLLBACK');
+    if (conflictingAppointment) {
       return res.status(409).json({
         error: 'Time slot unavailable',
         message: 'This time slot is already booked'
       });
     }
 
-    // Check doctor's schedule availability
-    const dayOfWeek = new Date(appointmentDate).getDay();
-    const scheduleResult = await client.query(
-      `SELECT id FROM doctor_schedules 
-       WHERE doctor_id = $1 AND day_of_week = $2 
-       AND start_time <= $3 AND end_time > $4 AND is_active = true`,
-      [doctorId, dayOfWeek, appointmentTime, appointmentTime]
-    );
+    // Create appointment using database wrapper
+    const appointmentData = {
+      patient_id: patientId,
+      doctor_id: doctorId,
+      appointment_date: appointmentDate,
+      appointment_time: appointmentTime,
+      reason_for_visit: reasonForVisit
+    };
 
-    if (scheduleResult.rows.length === 0) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({
-        error: 'Time slot unavailable',
-        message: 'Doctor is not available at this time'
-      });
-    }
-
-    // Create appointment
-    const appointmentResult = await client.query(
-      `INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, reason_for_visit, status)
-       VALUES ($1, $2, $3, $4, $5, 'scheduled')
-       RETURNING id, appointment_date, appointment_time, status, created_at`,
-      [patientId, doctorId, appointmentDate, appointmentTime, reasonForVisit]
-    );
-
-    const appointment = appointmentResult.rows[0];
-
-    await client.query('COMMIT');
+    const appointment = await database.createAppointment(appointmentData);
 
     // Get patient details for email
-    const patientDetailsResult = await query(
-      `SELECT u.first_name, u.last_name, u.email
-       FROM users u
-       JOIN patients p ON u.id = p.user_id
-       WHERE p.id = $1`,
-      [patientId]
-    );
+    const patientUser = await database.getUserById(userId);
 
-    const patient = patientDetailsResult.rows[0];
-
-    // Send confirmation emails
+    // Send email notifications
     try {
-      await sendAppointmentConfirmation({
-        patientEmail: patient.email,
-        patientName: `${patient.first_name} ${patient.last_name}`,
-        doctorEmail: doctor.email,
-        doctorName: `${doctor.first_name} ${doctor.last_name}`,
-        appointmentDate: appointment.appointment_date,
-        appointmentTime: appointment.appointment_time,
+      // Prepare email data
+      const emailData = {
         appointmentId: appointment.id,
-        reasonForVisit
-      });
+        patientName: `${patientUser.firstName} ${patientUser.lastName}`,
+        patientEmail: patientUser.email,
+        doctorName: `${doctor.first_name} ${doctor.last_name}`,
+        doctorEmail: doctor.email,
+        appointmentDate,
+        appointmentTime,
+        reasonForVisit: reasonForVisit || 'General consultation'
+      };
+
+      // Send confirmation email to patient
+      await emailService.sendAppointmentConfirmation(emailData);
+
+      // Send notification email to doctor
+      await emailService.sendDoctorNotification(emailData);
+
+      console.log('✅ Email notifications sent successfully');
     } catch (emailError) {
-      console.error('Email sending failed:', emailError);
+      console.error('⚠️ Email notification failed:', emailError.message);
       // Don't fail the appointment booking if email fails
     }
 
@@ -182,10 +145,11 @@ router.post('/', requireRole(['patient']), async (req, res, next) => {
     });
 
   } catch (error) {
-    await client.query('ROLLBACK');
-    next(error);
-  } finally {
-    client.release();
+    console.error('Appointment booking error:', error);
+    res.status(500).json({
+      error: 'Booking failed',
+      message: 'Failed to book appointment. Please try again.'
+    });
   }
 });
 
@@ -448,18 +412,20 @@ router.put('/:id', async (req, res, next) => {
     // Send cancellation email if appointment was cancelled
     if (updates.status === 'cancelled') {
       try {
-        await sendAppointmentCancellation({
-          patientEmail: currentAppointment.patient_email,
+        const emailData = {
+          appointmentId: appointmentId,
           patientName: `${currentAppointment.patient_first_name} ${currentAppointment.patient_last_name}`,
-          doctorEmail: currentAppointment.doctor_email,
+          patientEmail: currentAppointment.patient_email,
           doctorName: `${currentAppointment.doctor_first_name} ${currentAppointment.doctor_last_name}`,
           appointmentDate: currentAppointment.appointment_date,
           appointmentTime: currentAppointment.appointment_time,
-          appointmentId: appointmentId,
           cancellationReason: updates.cancellationReason
-        });
+        };
+
+        await emailService.sendCancellationEmail(emailData);
+        console.log('✅ Cancellation email sent successfully');
       } catch (emailError) {
-        console.error('Email sending failed:', emailError);
+        console.error('⚠️ Email sending failed:', emailError.message);
       }
     }
 

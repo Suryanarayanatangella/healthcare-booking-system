@@ -19,6 +19,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+
 import DashboardPage from './pages/DashboardPage'
 import BookAppointmentPage from './pages/appointments/BookAppointmentPage'
 import AppointmentsPage from './pages/appointments/AppointmentsPage'
@@ -29,7 +30,7 @@ import ProfilePage from './pages/profile/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Import doctor-specific pages
-import MySchedulePage from './pages/doctor/MySchedulePage'
+import SchedulePage from './pages/doctor/SchedulePage'
 import PatientManagementPage from './pages/doctor/PatientManagementPage'
 import AnalyticsPage from './pages/doctor/AnalyticsPage'
 
@@ -86,6 +87,7 @@ function App() {
               />
               <Route path="/doctors" element={<DoctorsPage />} />
               <Route path="/doctors/:id" element={<DoctorDetailsPage />} />
+
               
               {/* Protected routes */}
               <Route
@@ -134,7 +136,7 @@ function App() {
                 path="/schedule"
                 element={
                   <ProtectedRoute roles={['doctor']}>
-                    <MySchedulePage />
+                    <SchedulePage />
                   </ProtectedRoute>
                 }
               />

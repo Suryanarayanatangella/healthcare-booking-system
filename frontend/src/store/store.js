@@ -34,7 +34,7 @@ export const store = configureStore({
         ignoredPaths: ['items.dates'],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: import.meta.env.MODE !== 'production',
 })
 
 // Export types for TypeScript (if needed in the future)
