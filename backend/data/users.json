@@ -1,0 +1,89 @@
+[
+  {
+    "id": 1,
+    "email": "demo@patient.com",
+    "firstName": "Demo",
+    "lastName": "Patient",
+    "role": "patient",
+    "password": "$2b$10$demo.hash.for.testing",
+    "created_at": "2025-11-06T20:38:21.857Z",
+    "updated_at": "2025-11-06T20:38:21.859Z"
+  },
+  {
+    "id": 2,
+    "email": "demo@doctor.com",
+    "firstName": "Demo",
+    "lastName": "Doctor",
+    "role": "doctor",
+    "password": "$2b$10$demo.hash.for.testing",
+    "created_at": "2025-11-06T20:38:21.859Z",
+    "updated_at": "2025-11-06T20:38:21.859Z"
+  },
+  {
+    "id": 3,
+    "email": "sarah.johnson@hospital.com",
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "role": "doctor",
+    "password": "$2b$10$demo.hash.for.testing",
+    "created_at": "2025-11-06T20:38:21.859Z",
+    "updated_at": "2025-11-06T20:38:21.859Z"
+  },
+  {
+    "id": 4,
+    "email": "michael.chen@hospital.com",
+    "firstName": "Michael",
+    "lastName": "Chen",
+    "role": "doctor",
+    "password": "$2b$10$demo.hash.for.testing",
+    "created_at": "2025-11-06T20:38:21.859Z",
+    "updated_at": "2025-11-06T20:38:21.859Z"
+  },
+  {
+    "id": 5,
+    "email": "testdoctor2@test.com",
+    "password": "$2b$12$Ygh96iuUyunMSFYQyL2NleJUJ0D.C3xiH6OaogIXlbp1l/e1xsoi6",
+    "role": "doctor",
+    "firstName": "Test",
+    "lastName": "Doctor2",
+    "isVerified": true,
+    "created_at": "2025-11-06T20:54:00.887Z",
+    "updated_at": "2025-11-06T20:54:00.887Z"
+  },
+  {
+    "id": 6,
+    "email": "patient@test.com",
+    "password": "$2b$12$8z0/2aKboZQck2jc1Yzxueq7Ozij72kBlPhQ4AzAUls9UawZHbaci",
+    "role": "patient",
+    "firstName": "Test",
+    "lastName": "Patient",
+    "phone": "1234567890",
+    "isVerified": true,
+    "created_at": "2025-11-06T21:26:37.424Z",
+    "updated_at": "2025-11-06T21:26:37.424Z"
+  },
+  {
+    "id": 7,
+    "email": "narayana0249766@gmail.com",
+    "password": "$2b$12$/AjhSYA0QRH7OE..3oQ/M.ya211RIpLMjZzYOIqXbWBzWAH0QsBIC",
+    "role": "patient",
+    "firstName": "Surya",
+    "lastName": "Narayana",
+    "phone": "+91 9494549004",
+    "isVerified": true,
+    "created_at": "2025-11-06T21:44:42.744Z",
+    "updated_at": "2025-11-06T21:44:42.744Z"
+  },
+  {
+    "id": 9,
+    "email": "suryanarayana.tangella66@gmail.com",
+    "password": "$2b$12$MSFsmSihg7jmrYSSVFZ7.u1KNa6FKxn1Ht0uurwynMOoWj36TF/S2",
+    "role": "doctor",
+    "firstName": "Rithwik",
+    "lastName": "Akul Sai",
+    "phone": "+916355211624",
+    "isVerified": true,
+    "created_at": "2025-11-06T21:45:42.108Z",
+    "updated_at": "2025-11-06T21:45:42.108Z"
+  }
+]

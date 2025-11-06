@@ -9,7 +9,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
-const { query, getClient } = require('../config/database');
+const { database } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -30,9 +30,9 @@ const registerSchema = Joi.object({
   emergencyContactPhone: Joi.string().when('role', { is: 'patient', then: Joi.optional() }),
   // Doctor-specific fields
   specialization: Joi.string().when('role', { is: 'doctor', then: Joi.required() }),
-  licenseNumber: Joi.string().when('role', { is: 'doctor', then: Joi.required() }),
-  yearsOfExperience: Joi.number().min(0).when('role', { is: 'doctor', then: Joi.optional() }),
-  consultationFee: Joi.number().min(0).when('role', { is: 'doctor', then: Joi.optional() }),
+  licenseNumber: Joi.string().when('role', { is: 'doctor', then: Joi.optional() }),
+  yearsOfExperience: Joi.number().when('role', { is: 'doctor', then: Joi.optional() }),
+  consultationFee: Joi.number().when('role', { is: 'doctor', then: Joi.optional() }),
   bio: Joi.string().when('role', { is: 'doctor', then: Joi.optional() })
 });
 
@@ -46,10 +46,14 @@ const loginSchema = Joi.object({
  * @desc    Register a new user (patient or doctor)
  * @access  Public
  */
-router.post('/register', async (req, res, next) => {
-  const client = await getClient();
-  
+router.post('/register', async (req, res) => {
   try {
+    // Debug CORS
+    console.log('📝 Registration request received');
+    console.log('   Origin:', req.headers.origin);
+    console.log('   Method:', req.method);
+    console.log('   Content-Type:', req.headers['content-type']);
+
     // Validate request body
     const { error, value } = registerSchema.validate(req.body);
     if (error) {
@@ -78,16 +82,9 @@ router.post('/register', async (req, res, next) => {
       bio
     } = value;
 
-    await client.query('BEGIN');
-
     // Check if user already exists
-    const existingUser = await client.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (existingUser.rows.length > 0) {
-      await client.query('ROLLBACK');
+    const existingUser = await database.getUserByEmail(email);
+    if (existingUser) {
       return res.status(409).json({
         error: 'Registration failed',
         message: 'User with this email already exists'
@@ -96,83 +93,82 @@ router.post('/register', async (req, res, next) => {
 
     // Hash password
     const saltRounds = 12;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Insert user
-    const userResult = await client.query(
-      `INSERT INTO users (email, password_hash, first_name, last_name, phone, role)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, email, first_name, last_name, role, created_at`,
-      [email, passwordHash, firstName, lastName, phone, role]
-    );
+    // Create user
+    const userData = {
+      email,
+      password: hashedPassword,
+      role,
+      firstName,
+      lastName,
+      phone,
+      isVerified: true
+    };
 
-    const user = userResult.rows[0];
+    const user = await database.createUser(userData);
 
-    // Insert role-specific data
+    // Create role-specific profile
     if (role === 'patient') {
-      await client.query(
-        `INSERT INTO patients (user_id, date_of_birth, gender, address, emergency_contact_name, emergency_contact_phone)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [user.id, dateOfBirth, gender, address, emergencyContactName, emergencyContactPhone]
-      );
+      const patientData = {
+        userId: user.id,
+        dateOfBirth,
+        gender,
+        address,
+        emergencyContactName,
+        emergencyContactPhone
+      };
+      await database.createPatient(patientData);
     } else if (role === 'doctor') {
-      // Check if license number already exists
-      const existingLicense = await client.query(
-        'SELECT id FROM doctors WHERE license_number = $1',
-        [licenseNumber]
-      );
-
-      if (existingLicense.rows.length > 0) {
-        await client.query('ROLLBACK');
-        return res.status(409).json({
-          error: 'Registration failed',
-          message: 'Doctor with this license number already exists'
-        });
-      }
-
-      await client.query(
-        `INSERT INTO doctors (user_id, specialization, license_number, years_of_experience, consultation_fee, bio)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [user.id, specialization, licenseNumber, yearsOfExperience, consultationFee, bio]
-      );
+      const doctorData = {
+        userId: user.id,
+        specialization,
+        licenseNumber,
+        experience: yearsOfExperience,
+        consultationFee,
+        bio
+      };
+      await database.createDoctor(doctorData);
     }
-
-    await client.query('COMMIT');
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { 
+        userId: user.id, 
+        email: user.email, 
+        role: user.role 
+      },
+      process.env.JWT_SECRET || 'fallback-secret',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
     res.status(201).json({
-      message: 'User registered successfully',
+      message: 'Registration successful',
+      token,
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        role: user.role,
-        createdAt: user.created_at
-      },
-      token
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      }
     });
 
   } catch (error) {
-    await client.query('ROLLBACK');
-    next(error);
-  } finally {
-    client.release();
+    console.error('Registration error:', error);
+    res.status(500).json({
+      error: 'Registration failed',
+      message: 'Internal server error'
+    });
   }
 });
 
 /**
  * @route   POST /api/auth/login
- * @desc    Authenticate user and return token
+ * @desc    Login user
  * @access  Public
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', async (req, res) => {
   try {
     // Validate request body
     const { error, value } = loginSchema.validate(req.body);
@@ -185,114 +181,87 @@ router.post('/login', async (req, res, next) => {
 
     const { email, password } = value;
 
-    // Find user by email
-    const userResult = await query(
-      'SELECT id, email, password_hash, first_name, last_name, role, is_active FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (userResult.rows.length === 0) {
+    // Find user
+    const user = await database.getUserByEmail(email);
+    if (!user) {
       return res.status(401).json({
-        error: 'Authentication failed',
+        error: 'Login failed',
         message: 'Invalid email or password'
       });
     }
 
-    const user = userResult.rows[0];
-
-    // Check if user is active
-    if (!user.is_active) {
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
       return res.status(401).json({
-        error: 'Authentication failed',
-        message: 'Account is deactivated'
-      });
-    }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        error: 'Authentication failed',
+        error: 'Login failed',
         message: 'Invalid email or password'
       });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { 
+        userId: user.id, 
+        email: user.email, 
+        role: user.role 
+      },
+      process.env.JWT_SECRET || 'fallback-secret',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
     res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         role: user.role
-      },
-      token
+      }
     });
 
   } catch (error) {
-    next(error);
+    console.error('Login error:', error);
+    res.status(500).json({
+      error: 'Login failed',
+      message: 'Internal server error'
+    });
   }
 });
 
 /**
  * @route   GET /api/auth/me
- * @desc    Get current user profile
+ * @desc    Get current user info
  * @access  Private
  */
-router.get('/me', authenticateToken, async (req, res, next) => {
+router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const userRole = req.user.role;
-
-    // Get user details with role-specific information
-    let userQuery = `
-      SELECT u.id, u.email, u.first_name, u.last_name, u.phone, u.role, u.created_at
-      FROM users u
-      WHERE u.id = $1
-    `;
-
-    let roleSpecificQuery = '';
-    
-    if (userRole === 'patient') {
-      roleSpecificQuery = `
-        SELECT p.date_of_birth, p.gender, p.address, p.emergency_contact_name, p.emergency_contact_phone,
-               p.medical_history, p.allergies
-        FROM patients p
-        WHERE p.user_id = $1
-      `;
-    } else if (userRole === 'doctor') {
-      roleSpecificQuery = `
-        SELECT d.specialization, d.license_number, d.years_of_experience, d.consultation_fee,
-               d.bio, d.is_available
-        FROM doctors d
-        WHERE d.user_id = $1
-      `;
+    const user = await database.getUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User not found'
+      });
     }
-
-    const [userResult, roleResult] = await Promise.all([
-      query(userQuery, [userId]),
-      roleSpecificQuery ? query(roleSpecificQuery, [userId]) : Promise.resolve({ rows: [{}] })
-    ]);
-
-    const user = userResult.rows[0];
-    const roleData = roleResult.rows[0] || {};
 
     res.json({
       user: {
-        ...user,
-        ...roleData
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
       }
     });
 
   } catch (error) {
-    next(error);
+    console.error('Get user error:', error);
+    res.status(500).json({
+      error: 'Failed to get user',
+      message: 'Internal server error'
+    });
   }
 });
 
@@ -302,8 +271,6 @@ router.get('/me', authenticateToken, async (req, res, next) => {
  * @access  Private
  */
 router.post('/logout', authenticateToken, (req, res) => {
-  // In a JWT-based system, logout is typically handled client-side
-  // by removing the token from storage
   res.json({
     message: 'Logout successful'
   });

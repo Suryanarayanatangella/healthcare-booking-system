@@ -18,6 +18,7 @@ const authRoutes = require('./routes/auth');
 const appointmentRoutes = require('./routes/appointments');
 const doctorRoutes = require('./routes/doctors');
 const patientRoutes = require('./routes/patients');
+const emailRoutes = require('./routes/email');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -41,10 +42,33 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173', // Vite default port
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -75,6 +99,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/appointments', authenticateToken, appointmentRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', authenticateToken, patientRoutes);
+app.use('/api/email', emailRoutes);
 
 // 404 handler for undefined routes
 app.use('*', (req, res) => {

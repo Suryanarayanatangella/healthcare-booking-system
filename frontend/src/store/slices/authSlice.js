@@ -10,11 +10,12 @@ import authService from '../../services/authService'
 import { toast } from 'react-hot-toast'
 
 // Initial state
+const token = localStorage.getItem('token')
 const initialState = {
   user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: false,
-  isLoading: false,
+  token: token,
+  isAuthenticated: !!token, // Set to true if token exists
+  isLoading: !!token, // Set loading to true if we need to verify the token
   error: null,
 }
 

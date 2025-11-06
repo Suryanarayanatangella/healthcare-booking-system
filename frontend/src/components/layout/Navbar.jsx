@@ -40,17 +40,34 @@ const Navbar = () => {
   }
 
   // Navigation links for authenticated users
-  const navLinks = [
-    { name: 'Dashboard', href: '/dashboard', icon: Calendar },
-    { name: 'Book Appointment', href: '/book-appointment', icon: Calendar, roles: ['patient'] },
-    { name: 'My Appointments', href: '/appointments', icon: Calendar },
-    { name: 'Doctors', href: '/doctors', icon: Users },
-  ]
+  const getNavLinks = () => {
+    if (!user) return [];
+    
+    // Patient navigation
+    if (user.role === 'patient') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: Calendar },
+        { name: 'Book Appointment', href: '/book-appointment', icon: Calendar },
+        { name: 'My Appointments', href: '/appointments', icon: Calendar },
+      ];
+    }
+    
+    // Doctor navigation  
+    if (user.role === 'doctor') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: Calendar },
+        { name: 'My Appointments', href: '/appointments', icon: Calendar },
+        { name: 'My Schedule', href: '/schedule', icon: Calendar },
+      ];
+    }
+    
+    return [];
+  }
+  
+  const navLinks = getNavLinks()
 
-  // Filter nav links based on user role
-  const filteredNavLinks = navLinks.filter(link => 
-    !link.roles || (user && link.roles.includes(user.role))
-  )
+  // Use the nav links directly (already filtered by role)
+  const filteredNavLinks = navLinks
 
   // Check if current path is active
   const isActivePath = (path) => {
@@ -87,10 +104,10 @@ const Navbar = () => {
                       <Link
                         key={link.name}
                         to={link.href}
-                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${
+                        className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center space-x-1 tracking-wide ${
                           isActivePath(link.href)
                             ? 'bg-primary-100 text-primary-700'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
+                            : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                         }`}
                       >
                         <Icon className="h-4 w-4" />
@@ -100,18 +117,8 @@ const Navbar = () => {
                   })}
                 </>
               ) : (
-                <>
-                  <Link
-                    to="/doctors"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                      isActivePath('/doctors')
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
-                    }`}
-                  >
-                    Find Doctors
-                  </Link>
-                </>
+                // No navigation links for unauthenticated users on homepage
+                <></>
               )}
             </div>
           </div>
@@ -127,7 +134,7 @@ const Navbar = () => {
                   <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
                     <User className="h-5 w-5 text-primary-600" />
                   </div>
-                  <span className="text-text-primary font-medium">
+                  <span className="text-gray-900 font-semibold tracking-wide">
                     {user?.firstName} {user?.lastName}
                   </span>
                   <ChevronDown className="h-4 w-4 text-text-secondary" />
@@ -137,10 +144,10 @@ const Navbar = () => {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
                     <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-semibold text-gray-900 tracking-wide">
                         {user?.firstName} {user?.lastName}
                       </p>
-                      <p className="text-xs text-text-secondary capitalize">
+                      <p className="text-xs font-medium text-gray-600 capitalize tracking-wider">
                         {user?.role}
                       </p>
                     </div>
@@ -211,10 +218,10 @@ const Navbar = () => {
                       <User className="h-6 w-6 text-primary-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-semibold text-gray-900 tracking-wide">
                         {user?.firstName} {user?.lastName}
                       </p>
-                      <p className="text-xs text-text-secondary capitalize">
+                      <p className="text-xs font-medium text-gray-600 capitalize tracking-wider">
                         {user?.role}
                       </p>
                     </div>
@@ -264,18 +271,6 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link
-                  to="/doctors"
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActivePath('/doctors')
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Find Doctors
-                </Link>
-                
                 <Link
                   to="/login"
                   className="block px-3 py-2 rounded-md text-base font-medium text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors"

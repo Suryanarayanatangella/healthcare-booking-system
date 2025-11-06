@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "patient_id": 2,
+    "doctor_id": 1,
+    "appointment_date": "2025-11-08T00:00:00.000Z",
+    "appointment_time": "10:00",
+    "reason_for_visit": "Regular checkup for general health",
+    "status": "scheduled",
+    "created_at": "2025-11-06T21:31:53.673Z",
+    "updated_at": "2025-11-06T21:31:53.673Z"
+  },
+  {
+    "id": 1,
+    "patient_id": 2,
+    "doctor_id": 1,
+    "appointment_date": "2025-11-08T00:00:00.000Z",
+    "appointment_time": "11:00",
+    "reason_for_visit": "Doctor consultation booking test",
+    "status": "scheduled",
+    "created_at": "2025-11-06T21:49:40.928Z",
+    "updated_at": "2025-11-06T21:49:40.928Z"
+  },
+  {
+    "id": 1,
+    "patient_id": 2,
+    "doctor_id": 1,
+    "appointment_date": "2025-11-08T00:00:00.000Z",
+    "appointment_time": "09:00",
+    "reason_for_visit": "Test appointment booking",
+    "status": "scheduled",
+    "created_at": "2025-11-06T21:56:07.821Z",
+    "updated_at": "2025-11-06T21:56:07.821Z"
+  },
+  {
+    "id": 2,
+    "patient_id": 2,
+    "doctor_id": 2,
+    "appointment_date": "2025-11-09T00:00:00.000Z",
+    "appointment_time": "10:30",
+    "reason_for_visit": "Another test appointment",
+    "status": "scheduled",
+    "created_at": "2025-11-06T21:56:40.723Z",
+    "updated_at": "2025-11-06T21:56:40.723Z"
+  },
+  {
+    "id": 3,
+    "patient_id": 3,
+    "doctor_id": 6,
+    "appointment_date": "2025-11-10T00:00:00.000Z",
+    "appointment_time": "10:00",
+    "reason_for_visit": "Suffering from fever",
+    "status": "scheduled",
+    "created_at": "2025-11-06T21:59:15.376Z",
+    "updated_at": "2025-11-06T21:59:15.376Z"
+  },
+  {
+    "id": 4,
+    "patient_id": 3,
+    "doctor_id": 6,
+    "appointment_date": "2025-11-10T00:00:00.000Z",
+    "appointment_time": "09:30",
+    "reason_for_visit": "suffering from fever",
+    "status": "scheduled",
+    "created_at": "2025-11-06T22:08:04.288Z",
+    "updated_at": "2025-11-06T22:08:04.288Z"
+  }
+]
