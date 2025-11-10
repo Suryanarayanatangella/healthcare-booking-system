@@ -42,29 +42,47 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
+// Build allowed origins list
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173', // Vite default port
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+];
+
+// Add FRONTEND_URL if set (supports comma-separated values for multiple frontends)
+if (process.env.FRONTEND_URL) {
+  const frontendUrls = process.env.FRONTEND_URL.split(',').map(url => url.trim()).filter(Boolean);
+  allowedOrigins.push(...frontendUrls);
+  console.log('🌐 Allowed frontend URLs:', frontendUrls);
+}
+
+// Log CORS configuration on startup
+console.log('🔒 CORS Configuration:');
+console.log('   Allowed origins:', allowedOrigins);
+console.log('   FRONTEND_URL:', process.env.FRONTEND_URL || 'Not set');
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // Allow requests with no origin (like mobile apps, Postman, or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5173', // Vite default port
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:5173',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-    
+    // Check if origin is in allowed list
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      console.error('❌ CORS blocked origin:', origin);
+      console.error('✅ Allowed origins:', allowedOrigins);
+      console.error('🔧 Set FRONTEND_URL environment variable to allow this origin');
+      callback(new Error(`Not allowed by CORS. Origin: ${origin}. Please set FRONTEND_URL environment variable.`));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Authorization'],
   optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
