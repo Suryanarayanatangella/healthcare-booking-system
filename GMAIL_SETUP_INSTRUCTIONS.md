@@ -36,10 +36,10 @@
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=john.doe@gmail.com
+SMTP_USER=narayana024766@gmail.com
 SMTP_PASS=abcd efgh ijkl mnop
 SMTP_FROM_NAME=Healthcare Booking System
-SMTP_FROM_EMAIL=john.doe@gmail.com
+SMTP_FROM_EMAIL=narayana024766@gmail.com
 ```
 
 ## 🧪 **Testing Steps**
