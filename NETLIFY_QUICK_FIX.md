@@ -13,11 +13,12 @@ Ensure these match `netlify.toml`:
 
 **Build settings:**
 - Base directory: `frontend`
-- Build command: `npm install --legacy-peer-deps && npm run build`
+- Build command: `npm install --legacy-peer-deps --force && npm run build`
 - Publish directory: `dist` (relative to base directory)
+- **Node version**: `18.20.4` (CRITICAL - set this in UI!)
 
 **Environment variables:**
-- `NODE_VERSION=18` (if not auto-detected)
+- `NODE_VERSION=18.20.4` (MUST be set in Netlify UI)
 
 ### 3. Push Updated Configuration
 ```bash
