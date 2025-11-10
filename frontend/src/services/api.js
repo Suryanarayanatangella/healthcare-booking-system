@@ -8,9 +8,20 @@
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
 
+// Get API URL from environment variable or default to relative path
+const API_URL = import.meta.env.VITE_API_URL || '/api'
+
+// Log API URL in development and production (for debugging)
+if (import.meta.env.DEV) {
+  console.log('🔗 API Base URL:', API_URL)
+} else {
+  // Also log in production to help diagnose issues
+  console.log('🔗 API Base URL:', API_URL || 'Not set - using relative /api')
+}
+
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -129,10 +140,16 @@ api.interceptors.response.use(
           }
       }
     } else if (error.request) {
-      // Network error
-      toast.error('Network error. Please check your connection.')
+      // Network error - likely backend not connected
+      console.error('❌ Network Error - Backend may not be connected:', {
+        url: error.config?.url,
+        baseURL: API_URL,
+        message: 'Check if VITE_API_URL is set correctly in Netlify environment variables'
+      })
+      toast.error('Unable to connect to server. Please check your connection or contact support.')
     } else {
       // Other error
+      console.error('❌ Unexpected Error:', error)
       toast.error('An unexpected error occurred.')
     }
     
