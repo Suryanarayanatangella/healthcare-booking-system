@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
@@ -147,7 +148,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background-light p-4 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -591,9 +592,9 @@ const ProfilePage = () => {
               </h3>
               
               <div className="space-y-3">
-                <button className="w-full btn-outline text-left">
+                <Link to="/change-password" className="w-full btn-outline text-left block">
                   Change Password
-                </button>
+                </Link>
                 
                 <button className="w-full btn-outline text-left">
                   Two-Factor Authentication

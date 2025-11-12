@@ -19,6 +19,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import ChangePasswordPage from './pages/auth/ChangePasswordPage'
 
 import DashboardPage from './pages/DashboardPage'
 import BookAppointmentPage from './pages/appointments/BookAppointmentPage'
@@ -137,6 +138,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/change-password"
+                element={
+                  <ProtectedRoute>
+                    <ChangePasswordPage />
                   </ProtectedRoute>
                 }
               />
