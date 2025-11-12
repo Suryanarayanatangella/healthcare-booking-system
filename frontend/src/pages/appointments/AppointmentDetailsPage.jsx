@@ -101,7 +101,7 @@ const AppointmentDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-background-light p-4 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <button

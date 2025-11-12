@@ -223,7 +223,7 @@ const PatientManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-background-light p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div className="mb-4 lg:mb-0">

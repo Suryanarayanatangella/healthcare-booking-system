@@ -610,9 +610,10 @@ const HomePage = () => {
                   </div>
                 </div>
                 
-                <button className="w-full btn-primary">
+                <Link to="/register"
+                className="w-full btn-primary font-bold py-4 px-10 rounded-xl transition-all duration-300 inline-flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl text-lg">
                   Book Appointment
-                </button>
+                </Link>
               </div>
             </motion.div>
           </div>

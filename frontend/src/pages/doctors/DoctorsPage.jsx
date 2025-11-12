@@ -120,7 +120,7 @@ const DoctorsPage = () => {
                 onChange={handleSpecializationChange}
                 className="form-input w-full"
               >
-                <option value="">All Specializations</option>
+                <option key="all" value="">All Specializations</option>
                 {specializations.map((spec) => (
                   <option key={spec.name} value={spec.name}>
                     {spec.name} ({spec.doctorCount})

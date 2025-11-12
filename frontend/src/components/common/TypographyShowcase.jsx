@@ -9,7 +9,7 @@ import React from 'react';
 
 const TypographyShowcase = () => {
   return (
-    <div className="max-w-4xl mx-auto p-8 space-y-12">
+    <div className="max-w-full mx-auto p-8 space-y-12">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
           Enhanced Typography System

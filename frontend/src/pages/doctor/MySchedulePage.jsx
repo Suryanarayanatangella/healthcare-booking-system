@@ -184,7 +184,7 @@ const MySchedulePage = () => {
   if (scheduleLoading || appointmentsLoading) {
     return (
       <div className="min-h-screen bg-background-light p-4 lg:p-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-full mx-auto">
           <div className="mb-8">
             <div className="h-8 bg-gray-200 rounded w-64 mb-2 animate-pulse"></div>
             <div className="h-4 bg-gray-200 rounded w-96 animate-pulse"></div>
@@ -197,7 +197,7 @@ const MySchedulePage = () => {
 
   return (
     <div className="min-h-screen bg-background-light p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Page Header with Navigation and Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div className="mb-4 lg:mb-0">

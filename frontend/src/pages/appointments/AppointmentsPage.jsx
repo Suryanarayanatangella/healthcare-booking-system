@@ -76,7 +76,7 @@ const AppointmentsPage = () => {
 
   return (
     <div className="min-h-screen bg-background-light p-4 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-full mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
@@ -88,7 +88,7 @@ const AppointmentsPage = () => {
             </p>
           </div>
           
-          {user?.role === 'patient' && (
+          {/* {user?.role === 'patient' && (
             <Link
               to="/book-appointment"
               className="btn-primary flex items-center space-x-2 mt-4 sm:mt-0"
@@ -96,7 +96,7 @@ const AppointmentsPage = () => {
               <Plus className="h-4 w-4" />
               <span>Book New Appointment</span>
             </Link>
-          )}
+          )} */}
         </div>
 
         {/* Filters */}

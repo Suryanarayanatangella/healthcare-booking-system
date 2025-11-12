@@ -17,7 +17,8 @@ import {
   Settings,
   Plus,
   Home,
-  MessageSquare
+  MessageSquare,
+  FileText
 } from 'lucide-react'
 
 const Sidebar = () => {
@@ -35,6 +36,8 @@ const Sidebar = () => {
     const patientItems = [
       { name: 'Book Appointment', href: '/book-appointment', icon: Plus },
       { name: 'Find Doctors', href: '/doctors', icon: Users },
+      { name: 'My Messages', href: '/my-messages', icon: MessageSquare },
+      { name: 'Medical Records', href: '/medical-records', icon: FileText },
     ]
 
     const doctorItems = [
@@ -73,7 +76,7 @@ const Sidebar = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-text-primary truncate">
-                {user?.firstName} {user?.lastName}
+                <b className='text-primary-500'>{user?.firstName}</b> {user?.lastName}
               </p>
               <p className="text-xs text-text-secondary capitalize">
                 {user?.role}

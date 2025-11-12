@@ -94,7 +94,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {isAuthenticated ? (
                 <>
@@ -121,7 +121,7 @@ const Navbar = () => {
                 <></>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* User Menu / Auth Buttons */}
           <div className="hidden md:block">

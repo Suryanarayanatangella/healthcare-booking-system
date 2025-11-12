@@ -64,5 +64,38 @@
     "status": "scheduled",
     "created_at": "2025-11-06T22:08:04.288Z",
     "updated_at": "2025-11-06T22:08:04.288Z"
+  },
+  {
+    "id": 1,
+    "patient_id": 3,
+    "doctor_id": 6,
+    "appointment_date": "2025-11-13T00:00:00.000Z",
+    "appointment_time": "09:30",
+    "reason_for_visit": "Test Suffer",
+    "status": "scheduled",
+    "created_at": "2025-11-12T09:20:16.079Z",
+    "updated_at": "2025-11-12T09:20:16.079Z"
+  },
+  {
+    "id": 1,
+    "patient_id": 3,
+    "doctor_id": 6,
+    "appointment_date": "2025-11-13T00:00:00.000Z",
+    "appointment_time": "09:30",
+    "reason_for_visit": "Test suffer",
+    "status": "scheduled",
+    "created_at": "2025-11-12T10:00:40.192Z",
+    "updated_at": "2025-11-12T10:00:40.192Z"
+  },
+  {
+    "id": 1,
+    "patient_id": 3,
+    "doctor_id": 6,
+    "appointment_date": "2025-11-13T00:00:00.000Z",
+    "appointment_time": "15:30",
+    "reason_for_visit": "tttdddfwret",
+    "status": "scheduled",
+    "created_at": "2025-11-12T10:39:30.136Z",
+    "updated_at": "2025-11-12T10:39:30.136Z"
   }
 ]

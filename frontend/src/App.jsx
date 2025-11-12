@@ -31,6 +31,10 @@ import ProfilePage from './pages/profile/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+// Import patient-specific pages
+import PatientMessagesPage from './pages/patient/MessagesPage'
+import MedicalRecordsPage from './pages/patient/MedicalRecordsPage'
+
 // Import doctor-specific pages
 import SchedulePage from './pages/doctor/SchedulePage'
 import PatientManagementPage from './pages/doctor/PatientManagementPage'
@@ -147,6 +151,24 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ChangePasswordPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Patient-specific routes */}
+              <Route
+                path="/my-messages"
+                element={
+                  <ProtectedRoute roles={['patient']}>
+                    <PatientMessagesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/medical-records"
+                element={
+                  <ProtectedRoute roles={['patient']}>
+                    <MedicalRecordsPage />
                   </ProtectedRoute>
                 }
               />
