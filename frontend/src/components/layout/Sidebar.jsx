@@ -16,7 +16,8 @@ import {
   BarChart3,
   Settings,
   Plus,
-  Home
+  Home,
+  MessageSquare
 } from 'lucide-react'
 
 const Sidebar = () => {
@@ -39,6 +40,7 @@ const Sidebar = () => {
     const doctorItems = [
       { name: 'My Schedule', href: '/schedule', icon: Clock },
       { name: 'Patient Management', href: '/patients', icon: Users },
+      { name: 'Messages', href: '/messages', icon: MessageSquare },
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     ]
 
@@ -110,7 +112,7 @@ const Sidebar = () => {
         </nav>
 
         {/* Quick Actions for Patients */}
-        {user?.role === 'patient' && (
+        {/* {user?.role === 'patient' && (
           <div className="p-4 border-t border-gray-100">
             <Link
               to="/book-appointment"
@@ -120,7 +122,7 @@ const Sidebar = () => {
               <span>Book Appointment</span>
             </Link>
           </div>
-        )}
+        )} */}
 
         {/* Settings Link */}
         <div className="p-4 border-t border-gray-100">
