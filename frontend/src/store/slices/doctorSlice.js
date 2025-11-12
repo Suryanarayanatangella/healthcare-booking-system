@@ -138,6 +138,14 @@ const initialState = {
   doctors: [],
   selectedDoctor: null,
   
+  // Pagination
+  pagination: {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0
+  },
+  
   // Availability
   availableSlots: [],
   bookedSlots: [],

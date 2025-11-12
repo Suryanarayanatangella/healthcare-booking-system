@@ -192,7 +192,7 @@ const DoctorsPage = () => {
         {/* Results Header */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-text-secondary">
-            {isLoading ? 'Loading...' : `${pagination.total || doctors.length} doctors found`}
+            {isLoading ? 'Loading...' : `${pagination?.total || doctors?.length || 0} doctors found`}
           </p>
           
           {(searchQuery || selectedSpecialization) && (
