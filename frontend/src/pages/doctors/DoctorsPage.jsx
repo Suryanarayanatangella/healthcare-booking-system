@@ -159,20 +159,20 @@ const DoctorsPage = () => {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="form-input"
                   >
-                    <option value="name">Name</option>
-                    <option value="experience">Experience</option>
-                    <option value="rating">Rating</option>
-                    <option value="fee">Consultation Fee</option>
+                    <option key="name" value="name">Name</option>
+                    <option key="experience" value="experience">Experience</option>
+                    <option key="rating" value="rating">Rating</option>
+                    <option key="fee" value="fee">Consultation Fee</option>
                   </select>
                 </div>
                 
                 <div>
                   <label className="form-label">Experience</label>
                   <select className="form-input">
-                    <option value="">Any Experience</option>
-                    <option value="0-5">0-5 years</option>
-                    <option value="5-10">5-10 years</option>
-                    <option value="10+">10+ years</option>
+                    <option key="any" value="">Any Experience</option>
+                    <option key="0-5" value="0-5">0-5 years</option>
+                    <option key="5-10" value="5-10">5-10 years</option>
+                    <option key="10+" value="10+">10+ years</option>
                   </select>
                 </div>
                 
