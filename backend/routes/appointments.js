@@ -212,7 +212,7 @@ router.get('/', async (req, res, next) => {
     baseQuery += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
     queryParams.push(parseInt(limit), parseInt(offset));
 
-    const result = await query(baseQuery, queryParams);
+    const result = await database.query(baseQuery, queryParams);
 
     res.json({
       appointments: result.rows,
@@ -266,7 +266,7 @@ router.get('/:id', async (req, res, next) => {
       `;
     }
 
-    const result = await query(appointmentQuery, [appointmentId, userId]);
+    const result = await database.query(appointmentQuery, [appointmentId, userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -488,7 +488,7 @@ router.get('/doctor/:doctorId/availability', async (req, res, next) => {
     const dayOfWeek = new Date(date).getDay();
 
     // Get doctor's schedule for the day
-    const scheduleResult = await query(
+    const scheduleResult = await database.query(
       `SELECT start_time, end_time, slot_duration
        FROM doctor_schedules
        WHERE doctor_id = $1 AND day_of_week = $2 AND is_active = true`,
@@ -505,7 +505,7 @@ router.get('/doctor/:doctorId/availability', async (req, res, next) => {
     const schedule = scheduleResult.rows[0];
 
     // Get booked appointments for the date
-    const bookedResult = await query(
+    const bookedResult = await database.query(
       `SELECT appointment_time
        FROM appointments
        WHERE doctor_id = $1 AND appointment_date = $2 AND status NOT IN ('cancelled')`,
