@@ -27,6 +27,7 @@ import AppointmentDetailsPage from './pages/appointments/AppointmentDetailsPage'
 import DoctorsPage from './pages/doctors/DoctorsPage'
 import DoctorDetailsPage from './pages/doctors/DoctorDetailsPage'
 import ProfilePage from './pages/profile/ProfilePage'
+import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Import doctor-specific pages
@@ -127,6 +128,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />
