@@ -33,6 +33,7 @@ import NotFoundPage from './pages/NotFoundPage'
 // Import doctor-specific pages
 import SchedulePage from './pages/doctor/SchedulePage'
 import PatientManagementPage from './pages/doctor/PatientManagementPage'
+import PatientDetailsPage from './pages/doctor/PatientDetailsPage'
 import AnalyticsPage from './pages/doctor/AnalyticsPage'
 
 // Import Redux actions
@@ -154,6 +155,14 @@ function App() {
                 element={
                   <ProtectedRoute roles={['doctor']}>
                     <PatientManagementPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/patients/:id"
+                element={
+                  <ProtectedRoute roles={['doctor']}>
+                    <PatientDetailsPage />
                   </ProtectedRoute>
                 }
               />
