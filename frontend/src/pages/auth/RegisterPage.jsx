@@ -179,7 +179,7 @@ const RegisterPage = () => {
         </div>
 
         {/* Role Selection */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 dark:bg-gray-900 mb-6">
           <h3 className="text-lg font-semibold text-text-primary mb-4">
             I am a...
           </h3>

@@ -281,7 +281,7 @@ const PatientManagementPage = () => {
           ].map((stat, index) => {
             const Icon = stat.icon
             return (
-              <div key={index} className="card p-6">
+              <div key={index} className="card p-6 dark:bg-gray-900">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg ${stat.color}`}>
                     <Icon className="h-6 w-6" />
@@ -304,7 +304,7 @@ const PatientManagementPage = () => {
           })}
         </div>  
       {/* Search and Filter Controls */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 dark:bg-gray-900 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Input */}
             <div className="flex-1">

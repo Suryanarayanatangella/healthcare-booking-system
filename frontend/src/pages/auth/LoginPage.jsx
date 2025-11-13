@@ -191,7 +191,7 @@ const LoginPage = () => {
         </div>
 
         {/* Demo Accounts */}
-        <div className="card p-6 bg-blue-50 border-blue-200">
+        <div className="card p-6 dark:bg-gray-900 bg-blue-50 border-blue-200">
           <h3 className="text-sm font-medium text-blue-900 mb-3">Demo Accounts</h3>
           <div className="space-y-2 text-xs text-blue-800">
             <div>

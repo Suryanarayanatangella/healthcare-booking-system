@@ -196,7 +196,7 @@ const PatientDetailsPage = () => {
         </div>
 
         {/* Patient Header Card */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 dark:bg-gray-900 mb-6">
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-6">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -265,7 +265,7 @@ const PatientDetailsPage = () => {
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 {/* Contact Information */}
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <h2 className="text-xl font-semibold text-text-primary mb-4">
                     Contact Information
                   </h2>
@@ -295,7 +295,7 @@ const PatientDetailsPage = () => {
                 </div>
 
                 {/* Emergency Contact */}
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <h2 className="text-xl font-semibold text-text-primary mb-4">
                     Emergency Contact
                   </h2>
@@ -322,7 +322,7 @@ const PatientDetailsPage = () => {
                 </div>
 
                 {/* Current Medications */}
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <div className="flex items-center space-x-2 mb-4">
                     <Pill className="h-5 w-5 text-primary-600" />
                     <h2 className="text-xl font-semibold text-text-primary">
@@ -354,7 +354,7 @@ const PatientDetailsPage = () => {
             {activeTab === 'history' && (
               <div className="space-y-6">
                 {/* Conditions */}
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <div className="flex items-center space-x-2 mb-4">
                     <Stethoscope className="h-5 w-5 text-primary-600" />
                     <h2 className="text-xl font-semibold text-text-primary">
@@ -383,7 +383,7 @@ const PatientDetailsPage = () => {
                 </div>
 
                 {/* Allergies */}
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <div className="flex items-center space-x-2 mb-4">
                     <AlertCircle className="h-5 w-5 text-red-600" />
                     <h2 className="text-xl font-semibold text-text-primary">Allergies</h2>
@@ -411,7 +411,7 @@ const PatientDetailsPage = () => {
 
             {/* Appointments Tab */}
             {activeTab === 'appointments' && (
-              <div className="card p-6">
+              <div className="card p-6 dark:bg-gray-900">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">
                   Appointment History
                 </h2>
@@ -454,7 +454,7 @@ const PatientDetailsPage = () => {
             {/* Vitals Tab */}
             {activeTab === 'vitals' && (
               <div className="space-y-6">
-                <div className="card p-6">
+                <div className="card p-6 dark:bg-gray-900">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-2">
                       <Heart className="h-5 w-5 text-red-600" />
@@ -513,7 +513,7 @@ const PatientDetailsPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button className="w-full btn-primary">
@@ -533,7 +533,7 @@ const PatientDetailsPage = () => {
 
             {/* Alerts */}
             {patient.allergies.length > 0 && (
-              <div className="card p-6 bg-red-50 border-red-200">
+              <div className="card p-6 dark:bg-gray-900 bg-red-50 border-red-200">
                 <div className="flex items-center space-x-2 mb-3">
                   <AlertCircle className="h-5 w-5 text-red-600" />
                   <h3 className="text-lg font-semibold text-red-900">Allergy Alert</h3>
@@ -549,7 +549,7 @@ const PatientDetailsPage = () => {
             )}
 
             {/* Summary */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">Summary</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">

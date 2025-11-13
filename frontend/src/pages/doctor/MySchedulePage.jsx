@@ -235,7 +235,7 @@ const MySchedulePage = () => {
         </div>
 
         {/* Calendar Navigation and View Controls */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 dark:bg-gray-900 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             {/* Week Navigation */}
             <div className="flex items-center space-x-4 mb-4 lg:mb-0">
@@ -301,7 +301,7 @@ const MySchedulePage = () => {
         </div>
 
         {/* Weekly Calendar Grid */}
-        <div className="card p-6">
+        <div className="card p-6 dark:bg-gray-900">
           <div className="grid grid-cols-8 gap-4">
             {/* Time Column Header */}
             <div className="text-center font-medium text-text-secondary py-4">
@@ -408,7 +408,7 @@ const MySchedulePage = () => {
           ].map((stat, index) => {
             const Icon = stat.icon
             return (
-              <div key={index} className="card p-6">
+              <div key={index} className="card p-6 dark:bg-gray-900">
                 <div className="flex items-center">
                   <div className={`p-3 rounded-lg ${stat.color}`}>
                     <Icon className="h-6 w-6" />

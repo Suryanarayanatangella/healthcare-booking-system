@@ -118,13 +118,13 @@ const TypographyShowcase = () => {
           Card Typography Examples
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h3 className="text-heading text-lg mb-3">Doctor Information</h3>
             <p className="professional-text mb-2">Dr. Sarah Johnson</p>
             <p className="text-caption mb-2">Cardiology Specialist</p>
             <p className="subtle-text">15 years of experience in cardiovascular medicine</p>
           </div>
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h3 className="text-heading text-lg mb-3">Appointment Details</h3>
             <p className="readable-text mb-2">Regular Checkup</p>
             <p className="text-medium-contrast mb-1">November 8, 2024 at 10:00 AM</p>

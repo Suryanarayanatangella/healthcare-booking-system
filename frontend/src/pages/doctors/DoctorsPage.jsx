@@ -95,7 +95,7 @@ const DoctorsPage = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="card p-6 mb-8">
+        <div className="card p-6 dark:bg-gray-900 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Input */}
             <div className="flex-1">
@@ -222,7 +222,7 @@ const DoctorsPage = () => {
         ) : doctors.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {doctors.map((doctor) => (
-              <div key={doctor.id} className="card p-6 hover:shadow-lg transition-shadow duration-200">
+              <div key={doctor.id} className="card p-6 dark:bg-gray-900 hover:shadow-lg transition-shadow duration-200">
                 {/* Doctor Header */}
                 <div className="flex items-start space-x-4 mb-4">
                   <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">

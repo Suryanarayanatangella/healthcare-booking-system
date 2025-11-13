@@ -555,7 +555,7 @@ const ProfilePage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Account Status */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Account Status
               </h3>
@@ -586,7 +586,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Security */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Security
               </h3>
@@ -607,7 +607,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Privacy */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Privacy & Data
               </h3>

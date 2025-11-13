@@ -99,7 +99,7 @@ const NotFoundPage = () => {
         </div>
 
         {/* Quick Links */}
-        <div className="card p-6">
+        <div className="card p-6 dark:bg-gray-900">
           <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
             Quick Links
           </h3>

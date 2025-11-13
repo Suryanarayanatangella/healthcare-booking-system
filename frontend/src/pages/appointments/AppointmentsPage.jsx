@@ -100,7 +100,7 @@ const AppointmentsPage = () => {
         </div>
 
         {/* Filters */}
-        <div className="card p-6 mb-6">
+        <div className="card p-6 dark:bg-gray-900 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -145,7 +145,7 @@ const AppointmentsPage = () => {
         ) : filteredAppointments.length > 0 ? (
           <div className="space-y-4">
             {filteredAppointments.map((appointment) => (
-              <div key={appointment.id} className="card p-6 hover:shadow-lg transition-shadow">
+              <div key={appointment.id} className="card p-6 dark:bg-gray-900 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">

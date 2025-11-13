@@ -132,7 +132,7 @@ const ChangePasswordPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Form */}
           <div className="lg:col-span-2">
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <Formik
                 initialValues={{
                   currentPassword: '',
@@ -312,7 +312,7 @@ const ChangePasswordPage = () => {
           {/* Sidebar - Password Requirements */}
           <div className="space-y-6">
             {/* User Info */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Account
               </h3>
@@ -329,7 +329,7 @@ const ChangePasswordPage = () => {
             </div>
 
             {/* Password Requirements */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Password Requirements
               </h3>
@@ -358,7 +358,7 @@ const ChangePasswordPage = () => {
             </div>
 
             {/* Security Tips */}
-            <div className="card p-6 bg-blue-50 border-blue-200">
+            <div className="card p-6 dark:bg-gray-900 bg-blue-50 border-blue-200">
               <div className="flex items-start space-x-3">
                 <Shield className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>

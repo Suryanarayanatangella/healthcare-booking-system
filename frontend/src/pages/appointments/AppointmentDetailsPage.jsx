@@ -210,7 +210,7 @@ const AppointmentDetailsPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Appointment Overview */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-heading font-bold text-text-primary">
                   Appointment Details
@@ -298,7 +298,7 @@ const AppointmentDetailsPage = () => {
 
             {/* Contact Information */}
             {user?.role === 'doctor' && (
-              <div className="card p-6">
+              <div className="card p-6 dark:bg-gray-900">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">
                   Patient Information
                 </h2>
@@ -359,7 +359,7 @@ const AppointmentDetailsPage = () => {
             {/* Actions */}
             {currentAppointment.status === 'scheduled' && (
               <>
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Actions
               </h3>
@@ -391,7 +391,7 @@ const AppointmentDetailsPage = () => {
             )}
 
             {/* Appointment Timeline */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Timeline
               </h3>

@@ -169,7 +169,7 @@ const DashboardPage = () => {
               quickStats.map((stat) => {
                 const Icon = stat.icon
                 return (
-                  <div key={stat.name} className="card p-6">
+                  <div key={stat.name} className="card p-6 dark:bg-gray-900">
                     <div className="flex items-center">
                       <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                         <Icon className={`h-6 w-6 ${stat.color}`} />
@@ -194,7 +194,7 @@ const DashboardPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Upcoming Appointments */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-heading font-semibold text-text-primary">
                   Upcoming Appointments
@@ -276,7 +276,7 @@ const DashboardPage = () => {
 
             {/* Next Appointment Highlight - Only for patients */}
             {user?.role === 'patient' && stats?.nextAppointment && (
-              <div className="card p-6 bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200">
+              <div className="card p-6 dark:bg-gray-900 bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200">
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
                     <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
@@ -314,7 +314,7 @@ const DashboardPage = () => {
           {/* Sidebar */}
           <div className="space-y-8">
             {/* Quick Actions */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
                 Quick Actions
               </h3>
@@ -341,7 +341,7 @@ const DashboardPage = () => {
             </div>
 
             {/* Health Tips or Practice Tips */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-heading font-semibold text-text-primary mb-4">
                 {user?.role === 'patient' ? 'Health Tips' : 'Practice Tips'}
               </h3>

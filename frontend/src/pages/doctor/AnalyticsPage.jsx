@@ -320,7 +320,7 @@ const AnalyticsPage = () => {
             const TrendIcon = metric.trend === 'up' ? ArrowUp : ArrowDown
             
             return (
-              <div key={index} className="card p-6">
+              <div key={index} className="card p-6 dark:bg-gray-900">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg ${metric.color}`}>
                     <Icon className="h-6 w-6" />
@@ -349,7 +349,7 @@ const AnalyticsPage = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Appointment Trends */}
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-text-primary">
                 Appointment Trends
@@ -374,7 +374,7 @@ const AnalyticsPage = () => {
           </div>
 
           {/* Appointment Status Distribution */}
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-text-primary mb-6">
               Appointment Status
             </h2>
@@ -407,7 +407,7 @@ const AnalyticsPage = () => {
         </div>
 
         {/* Performance Metrics */}
-        <div className="card p-6 mb-8">
+        <div className="card p-6 dark:bg-gray-900 mb-8">
           <h2 className="text-xl font-semibold text-text-primary mb-6">
             Performance Metrics
           </h2>
@@ -461,7 +461,7 @@ const AnalyticsPage = () => {
         {/* Detailed Analytics */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Patient Demographics */}
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-text-primary mb-6">
               Patient Demographics
             </h2>
@@ -522,7 +522,7 @@ const AnalyticsPage = () => {
           </div>
 
           {/* Revenue Breakdown */}
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-text-primary mb-6">
               Revenue Analysis
             </h2>
@@ -566,7 +566,7 @@ const AnalyticsPage = () => {
           </div>
 
           {/* Patient Satisfaction */}
-          <div className="card p-6">
+          <div className="card p-6 dark:bg-gray-900">
             <h2 className="text-xl font-semibold text-text-primary mb-6">
               Patient Satisfaction
             </h2>

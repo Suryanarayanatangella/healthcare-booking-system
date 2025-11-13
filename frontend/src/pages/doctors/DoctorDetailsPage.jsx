@@ -310,7 +310,7 @@ const DoctorDetailsPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Booking Card */}
-            <div className="card p-6 sticky top-8">
+            <div className="card p-6 dark:bg-gray-900 sticky top-8">
               <div className="text-center mb-6">
                 <div className="text-2xl font-bold text-text-primary mb-2">
                   {formatConsultationFee(currentDoctor.consultationFee)}
@@ -365,7 +365,7 @@ const DoctorDetailsPage = () => {
             </div>
 
             {/* Quick Info */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Quick Information
               </h3>
@@ -402,7 +402,7 @@ const DoctorDetailsPage = () => {
             </div>
 
             {/* Office Hours */}
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               <h3 className="text-lg font-semibold text-text-primary mb-4">
                 Office Hours
               </h3>

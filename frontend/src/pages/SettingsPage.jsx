@@ -300,7 +300,7 @@ const SettingsPage = () => {
 
           {/* Settings Content */}
           <div className="lg:col-span-3">
-            <div className="card p-6">
+            <div className="card p-6 dark:bg-gray-900">
               {/* Profile Settings */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
