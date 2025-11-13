@@ -168,7 +168,7 @@ const AppointmentsPage = () => {
                         
                         <div className="flex items-center space-x-1">
                           <Clock className="h-4 w-4" />
-                          <span>{formatTime(appointment.appointmentTime)}</span>
+                          <span>{appointment.appointmentTime}</span>
                         </div>
                       </div>
                       

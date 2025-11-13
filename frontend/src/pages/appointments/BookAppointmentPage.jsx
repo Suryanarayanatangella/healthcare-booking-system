@@ -352,7 +352,7 @@ const BookAppointmentPage = () => {
                               className={`
                                 p-3 rounded-lg border-2 transition-all text-sm font-medium
                                 ${values.appointmentTime === slot
-                                  ? 'border-primary bg-primary text-white'
+                                  ? 'border-primary bg-primary-500 text-white'
                                   : 'border-gray-200 hover:border-primary/50 text-text-primary'
                                 }
                               `}

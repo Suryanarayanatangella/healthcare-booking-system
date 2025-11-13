@@ -4,7 +4,7 @@
  * Allows doctors to send and receive messages from patients
  */
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
   Send,
@@ -15,75 +15,89 @@ import {
   MoreVertical,
   Phone,
   Video,
-  Archive
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import * as messageService from '../../services/messageService';
+import CallModal from '../../components/messaging/CallModal';
 
 const MessagingPage = () => {
   const { user } = useSelector((state) => state.auth);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messageText, setMessageText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [conversations, setConversations] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const [callType, setCallType] = useState(null); // 'audio' or 'video'
 
-  // Mock conversations data
-  const [conversations] = useState([
-    {
-      id: 1,
-      patientName: 'John Doe',
-      patientId: 101,
-      lastMessage: 'Thank you for the consultation, Doctor.',
-      timestamp: '2024-01-15T10:30:00',
-      unread: 2,
-      avatar: null
-    },
-    {
-      id: 2,
-      patientName: 'Jane Smith',
-      patientId: 102,
-      lastMessage: 'When should I take the medication?',
-      timestamp: '2024-01-15T09:15:00',
-      unread: 0,
-      avatar: null
-    },
-    {
-      id: 3,
-      patientName: 'Mike Johnson',
-      patientId: 103,
-      lastMessage: 'I need to reschedule my appointment.',
-      timestamp: '2024-01-14T16:45:00',
-      unread: 1,
-      avatar: null
+  // Load conversations on mount
+  useEffect(() => {
+    loadConversations();
+  }, []);
+
+  // Load messages when conversation is selected
+  useEffect(() => {
+    if (selectedConversation) {
+      loadMessages(selectedConversation.id);
     }
-  ]);
+  }, [selectedConversation]);
 
-  // Mock messages for selected conversation
-
-  const getMessages = (conversationId) => {
-    const mockMessages = {
-      1: [
-        { id: 1, sender: 'patient', text: 'Hello Doctor, I have a question about my prescription.', timestamp: '2024-01-15T10:00:00' },
-        { id: 2, sender: 'doctor', text: 'Hello! Of course, what would you like to know?', timestamp: '2024-01-15T10:05:00' },
-        { id: 3, sender: 'patient', text: 'Should I take the medication before or after meals?', timestamp: '2024-01-15T10:10:00' },
-        { id: 4, sender: 'doctor', text: 'Please take it after meals, twice a day.', timestamp: '2024-01-15T10:15:00' },
-        { id: 5, sender: 'patient', text: 'Thank you for the consultation, Doctor.', timestamp: '2024-01-15T10:30:00' }
-      ],
-      2: [
-        { id: 1, sender: 'patient', text: 'Good morning Doctor!', timestamp: '2024-01-15T09:00:00' },
-        { id: 2, sender: 'doctor', text: 'Good morning! How can I help you today?', timestamp: '2024-01-15T09:05:00' },
-        { id: 3, sender: 'patient', text: 'When should I take the medication?', timestamp: '2024-01-15T09:15:00' }
-      ],
-      3: [
-        { id: 1, sender: 'patient', text: 'Hi Doctor, I need to reschedule my appointment.', timestamp: '2024-01-14T16:45:00' }
-      ]
-    };
-    return mockMessages[conversationId] || [];
+  const loadConversations = async () => {
+    try {
+      setLoading(true);
+      const data = await messageService.getConversations();
+      setConversations(data.conversations || []);
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+      toast.error('Failed to load conversations');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSendMessage = () => {
+  const loadMessages = async (conversationId) => {
+    try {
+      const data = await messageService.getConversationMessages(conversationId);
+      setMessages(data.messages || []);
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+      toast.error('Failed to load messages');
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!messageText.trim() || !selectedConversation) return;
     
-    toast.success('Message sent!');
-    setMessageText('');
+    try {
+      await messageService.sendMessage(selectedConversation.id, messageText);
+      toast.success('Message sent!');
+      setMessageText('');
+      
+      // Reload messages and conversations
+      await loadMessages(selectedConversation.id);
+      await loadConversations();
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      toast.error('Failed to send message');
+    }
+  };
+
+  const handleStartCall = (type) => {
+    if (!selectedConversation) {
+      toast.error('Please select a conversation first');
+      return;
+    }
+    setCallType(type);
+    setIsCallModalOpen(true);
+    toast.success(`Starting ${type} call...`);
+  };
+
+  const handleCloseCall = () => {
+    setIsCallModalOpen(false);
+    setCallType(null);
   };
 
   const formatTime = (timestamp) => {
@@ -98,8 +112,19 @@ const MessagingPage = () => {
   };
 
   const filteredConversations = conversations.filter(conv =>
-    conv.patientName.toLowerCase().includes(searchQuery.toLowerCase())
+    conv.patientName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="h-screen bg-background-light flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading messages...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-background-light flex">
@@ -126,7 +151,16 @@ const MessagingPage = () => {
 
         {/* Conversations */}
         <div className="flex-1 overflow-y-auto">
-          {filteredConversations.map((conversation) => (
+          {filteredConversations.length === 0 ? (
+            <div className="p-8 text-center">
+              <User className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-text-secondary">No conversations yet</p>
+              <p className="text-sm text-text-secondary mt-1">
+                Patients will appear here when they message you
+              </p>
+            </div>
+          ) : (
+            filteredConversations.map((conversation) => (
             <button
               key={conversation.id}
               onClick={() => setSelectedConversation(conversation)}
@@ -148,7 +182,7 @@ const MessagingPage = () => {
                   </span>
                 </div>
                 <p className="text-sm text-text-secondary truncate">
-                  {conversation.lastMessage}
+                  {conversation.lastMessage || 'No messages yet'}
                 </p>
               </div>
               
@@ -160,7 +194,8 @@ const MessagingPage = () => {
                 </div>
               )}
             </button>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -185,10 +220,18 @@ const MessagingPage = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button 
+                  onClick={() => handleStartCall('audio')}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Start audio call"
+                >
                   <Phone className="h-5 w-5 text-gray-600" />
                 </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button 
+                  onClick={() => handleStartCall('video')}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Start video call"
+                >
                   <Video className="h-5 w-5 text-gray-600" />
                 </button>
                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -199,28 +242,43 @@ const MessagingPage = () => {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-              {getMessages(selectedConversation.id).map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'doctor' ? 'justify-end' : 'justify-start'}`}
-                >
+              {messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-text-secondary">No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((message) => (
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.sender === 'doctor'
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-white text-text-primary border border-gray-200'
-                    }`}
+                    key={message.id}
+                    className={`flex ${message.senderRole === 'doctor' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <p className="text-sm">{message.text}</p>
-                    <div className="flex items-center justify-end space-x-1 mt-1">
-                      <Clock className="h-3 w-3 opacity-70" />
-                      <span className="text-xs opacity-70">
-                        {formatTime(message.timestamp)}
-                      </span>
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        message.senderRole === 'doctor'
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-white text-text-primary border border-gray-200'
+                      }`}
+                    >
+                      <p className="text-sm text-white">{message.text}</p>
+                      <div className="flex items-center justify-end space-x-1 mt-1">
+                        <span className="text-xs opacity-70">
+                          {formatTime(message.timestamp)}
+                        </span>
+                        {/* Read indicators - only show for sent messages (doctor's messages) */}
+                        {message.senderRole === 'doctor' && (
+                          <span className="ml-1">
+                            {message.read ? (
+                              <CheckCheck className="h-3 w-3 text-blue-400" title="Read" />
+                            ) : (
+                              <Check className="h-3 w-3 opacity-70" title="Delivered" />
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Message Input */}
@@ -233,7 +291,7 @@ const MessagingPage = () => {
                 <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         handleSendMessage();
@@ -270,6 +328,15 @@ const MessagingPage = () => {
           </div>
         )}
       </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallModalOpen}
+        onClose={handleCloseCall}
+        callType={callType}
+        recipientName={selectedConversation?.patientName}
+        recipientRole="patient"
+      />
     </div>
   );
 };

@@ -58,10 +58,7 @@ const appointmentService = {
    * @returns {Promise} API response
    */
   cancelAppointment: async (appointmentId, cancellationReason) => {
-    const response = await put(`/appointments/${appointmentId}`, {
-      status: 'cancelled',
-      cancellationReason,
-    })
+    const response = await del(`/appointments/${appointmentId}`)
     return response.data
   },
 
@@ -89,14 +86,14 @@ const appointmentService = {
   /**
    * Reschedule appointment
    * @param {string} appointmentId - Appointment ID
-   * @param {string} newDate - New appointment date
-   * @param {string} newTime - New appointment time
+   * @param {Object} data - Object containing appointmentDate and appointmentTime
    * @returns {Promise} API response
    */
-  rescheduleAppointment: async (appointmentId, newDate, newTime) => {
+  rescheduleAppointment: async (appointmentId, data) => {
     const response = await put(`/appointments/${appointmentId}`, {
-      appointmentDate: newDate,
-      appointmentTime: newTime,
+      appointmentDate: data.appointmentDate,
+      appointmentTime: data.appointmentTime,
+      status: 'rescheduled'
     })
     return response.data
   },

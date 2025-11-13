@@ -330,8 +330,8 @@ const DashboardPage = () => {
                       <div className="flex items-center space-x-3">
                         <Icon className="h-5 w-5" />
                         <div>
-                          <p className="font-medium">{action.name}</p>
-                          <p className="text-sm opacity-90">{action.description}</p>
+                          <p className="font-medium text-white">{action.name}</p>
+                          <p className="text-sm opacity-90 text-white">{action.description}</p>
                         </div>
                       </div>
                     </Link>

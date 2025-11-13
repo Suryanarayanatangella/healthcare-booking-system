@@ -1,11 +1,11 @@
 /**
  * Settings Page Component
  * 
- * User settings and preferences management page
+ * User settings and preferences management page with full backend integration
  */
 
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   User,
   Bell,
@@ -17,35 +17,56 @@ import {
   Shield,
   Save,
   Eye,
-  EyeOff
+  EyeOff,
+  Download,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import {
+  fetchSettings,
+  updateProfile,
+  updateNotifications,
+  updateSecurity,
+  updatePrivacy,
+  updatePreferences,
+  clearError,
+  clearUpdateSuccess
+} from '../store/slices/settingsSlice';
+import settingsService from '../services/settingsService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SettingsPage = () => {
-  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const { theme, setTheme } = useTheme();
+  const { settings, loading, error, updateSuccess } = useSelector((state) => state.settings);
+  
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Settings state
-  const [settings, setSettings] = useState({
-    // Profile settings
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
+  // Local state for form inputs
+  const [formData, setFormData] = useState({
+    // Profile
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    gender: '',
     
-    // Notification settings
+    // Notifications
     emailNotifications: true,
     smsNotifications: false,
     appointmentReminders: true,
     promotionalEmails: false,
     
-    // Privacy settings
+    // Privacy
     profileVisibility: 'public',
     showEmail: false,
     showPhone: false,
     
-    // Security settings
+    // Security
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -56,6 +77,49 @@ const SettingsPage = () => {
     theme: 'light'
   });
 
+  // Fetch settings on mount
+  useEffect(() => {
+    dispatch(fetchSettings());
+  }, [dispatch]);
+
+  // Update form data when settings are loaded
+  useEffect(() => {
+    if (settings) {
+      setFormData({
+        ...formData,
+        ...settings.profile,
+        ...settings.notifications,
+        ...settings.privacy,
+        ...settings.preferences
+      });
+    }
+  }, [settings]);
+
+  // Handle success/error notifications
+  useEffect(() => {
+    if (updateSuccess) {
+      toast.success('Settings updated successfully!');
+      dispatch(clearUpdateSuccess());
+      
+      // Clear password fields after successful update
+      if (activeTab === 'security') {
+        setFormData(prev => ({
+          ...prev,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        }));
+      }
+    }
+  }, [updateSuccess, dispatch, activeTab]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'notifications', name: 'Notifications', icon: Bell },
@@ -65,13 +129,118 @@ const SettingsPage = () => {
   ];
 
   const handleInputChange = (field, value) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Immediately apply theme change for instant visual feedback
+    if (field === 'theme') {
+      setTheme(value);
+    }
   };
 
-  const handleSave = (section) => {
-    // TODO: Implement API call to save settings
-    toast.success(`${section} settings saved successfully!`);
+  const handleSaveProfile = () => {
+    const profileData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
+      gender: formData.gender
+    };
+    dispatch(updateProfile(profileData));
   };
+
+  const handleSaveNotifications = () => {
+    const notificationData = {
+      emailNotifications: formData.emailNotifications,
+      smsNotifications: formData.smsNotifications,
+      appointmentReminders: formData.appointmentReminders,
+      promotionalEmails: formData.promotionalEmails
+    };
+    dispatch(updateNotifications(notificationData));
+  };
+
+  const handleSaveSecurity = () => {
+    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+      toast.error('All password fields are required');
+      return;
+    }
+    
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    
+    if (formData.newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters long');
+      return;
+    }
+    
+    const securityData = {
+      currentPassword: formData.currentPassword,
+      newPassword: formData.newPassword,
+      confirmPassword: formData.confirmPassword
+    };
+    dispatch(updateSecurity(securityData));
+  };
+
+  const handleSavePrivacy = () => {
+    const privacyData = {
+      profileVisibility: formData.profileVisibility,
+      showEmail: formData.showEmail,
+      showPhone: formData.showPhone
+    };
+    dispatch(updatePrivacy(privacyData));
+  };
+
+  const handleSavePreferences = () => {
+    const preferencesData = {
+      language: formData.language,
+      timezone: formData.timezone,
+      theme: formData.theme
+    };
+    // Update theme context immediately for instant visual feedback
+    setTheme(formData.theme);
+    dispatch(updatePreferences(preferencesData));
+  };
+
+  const handleExportData = async () => {
+    try {
+      const data = await settingsService.exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `user-data-export-${new Date().toISOString()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Data exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export data');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await settingsService.deleteAccount({ password: 'demo', confirmation: 'DELETE' });
+      toast.success('Account deletion request submitted');
+      setShowDeleteModal(false);
+    } catch (error) {
+      toast.error('Failed to delete account');
+    }
+  };
+
+  if (loading && !settings.profile.firstName) {
+    return (
+      <div className="min-h-screen bg-background-light flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-text-secondary">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background-light py-8">
@@ -107,6 +276,25 @@ const SettingsPage = () => {
                   );
                 })}
               </nav>
+              
+              {/* Data Management */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-text-secondary mb-3">Data Management</h3>
+                <button
+                  onClick={handleExportData}
+                  className="w-full flex items-center px-3 py-2 text-sm font-medium text-text-secondary hover:bg-gray-50 hover:text-text-primary rounded-lg transition-colors"
+                >
+                  <Download className="mr-3 h-5 w-5" />
+                  Export Data
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors mt-1"
+                >
+                  <Trash2 className="mr-3 h-5 w-5" />
+                  Delete Account
+                </button>
+              </div>
             </div>
           </div>
 
@@ -125,7 +313,7 @@ const SettingsPage = () => {
                         <label className="form-label">First Name</label>
                         <input
                           type="text"
-                          value={settings.firstName}
+                          value={formData.firstName}
                           onChange={(e) => handleInputChange('firstName', e.target.value)}
                           className="form-input"
                         />
@@ -134,7 +322,7 @@ const SettingsPage = () => {
                         <label className="form-label">Last Name</label>
                         <input
                           type="text"
-                          value={settings.lastName}
+                          value={formData.lastName}
                           onChange={(e) => handleInputChange('lastName', e.target.value)}
                           className="form-input"
                         />
@@ -145,7 +333,7 @@ const SettingsPage = () => {
                           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                           <input
                             type="email"
-                            value={settings.email}
+                            value={formData.email}
                             onChange={(e) => handleInputChange('email', e.target.value)}
                             className="form-input pl-10"
                           />
@@ -157,21 +345,44 @@ const SettingsPage = () => {
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                           <input
                             type="tel"
-                            value={settings.phone}
+                            value={formData.phone}
                             onChange={(e) => handleInputChange('phone', e.target.value)}
                             className="form-input pl-10"
                           />
                         </div>
                       </div>
+                      <div>
+                        <label className="form-label">Date of Birth</label>
+                        <input
+                          type="date"
+                          value={formData.dateOfBirth}
+                          onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                          className="form-input"
+                        />
+                      </div>
+                      <div>
+                        <label className="form-label">Gender</label>
+                        <select
+                          value={formData.gender}
+                          onChange={(e) => handleInputChange('gender', e.target.value)}
+                          className="form-input"
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleSave('Profile')}
-                      className="btn-primary flex items-center space-x-2"
+                      onClick={handleSaveProfile}
+                      disabled={loading}
+                      className="btn-primary flex items-center space-x-2 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
-                      <span>Save Changes</span>
+                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                   </div>
                 </div>
@@ -198,7 +409,7 @@ const SettingsPage = () => {
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={settings[item.key]}
+                            checked={formData[item.key]}
                             onChange={(e) => handleInputChange(item.key, e.target.checked)}
                             className="sr-only peer"
                           />
@@ -209,11 +420,12 @@ const SettingsPage = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleSave('Notification')}
-                      className="btn-primary flex items-center space-x-2"
+                      onClick={handleSaveNotifications}
+                      disabled={loading}
+                      className="btn-primary flex items-center space-x-2 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
-                      <span>Save Changes</span>
+                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                   </div>
                 </div>
@@ -232,7 +444,7 @@ const SettingsPage = () => {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                         <input
                           type={showPassword ? 'text' : 'password'}
-                          value={settings.currentPassword}
+                          value={formData.currentPassword}
                           onChange={(e) => handleInputChange('currentPassword', e.target.value)}
                           className="form-input pl-10 pr-10"
                         />
@@ -253,16 +465,17 @@ const SettingsPage = () => {
                       <label className="form-label">New Password</label>
                       <input
                         type="password"
-                        value={settings.newPassword}
+                        value={formData.newPassword}
                         onChange={(e) => handleInputChange('newPassword', e.target.value)}
                         className="form-input"
+                        placeholder="At least 8 characters"
                       />
                     </div>
                     <div>
                       <label className="form-label">Confirm New Password</label>
                       <input
                         type="password"
-                        value={settings.confirmPassword}
+                        value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                         className="form-input"
                       />
@@ -270,11 +483,12 @@ const SettingsPage = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleSave('Security')}
-                      className="btn-primary flex items-center space-x-2"
+                      onClick={handleSaveSecurity}
+                      disabled={loading}
+                      className="btn-primary flex items-center space-x-2 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
-                      <span>Update Password</span>
+                      <span>{loading ? 'Updating...' : 'Update Password'}</span>
                     </button>
                   </div>
                 </div>
@@ -290,7 +504,7 @@ const SettingsPage = () => {
                     <div>
                       <label className="form-label">Profile Visibility</label>
                       <select
-                        value={settings.profileVisibility}
+                        value={formData.profileVisibility}
                         onChange={(e) => handleInputChange('profileVisibility', e.target.value)}
                         className="form-input"
                       >
@@ -307,7 +521,7 @@ const SettingsPage = () => {
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={settings.showEmail}
+                          checked={formData.showEmail}
                           onChange={(e) => handleInputChange('showEmail', e.target.checked)}
                           className="sr-only peer"
                         />
@@ -322,7 +536,7 @@ const SettingsPage = () => {
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={settings.showPhone}
+                          checked={formData.showPhone}
                           onChange={(e) => handleInputChange('showPhone', e.target.checked)}
                           className="sr-only peer"
                         />
@@ -332,11 +546,12 @@ const SettingsPage = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleSave('Privacy')}
-                      className="btn-primary flex items-center space-x-2"
+                      onClick={handleSavePrivacy}
+                      disabled={loading}
+                      className="btn-primary flex items-center space-x-2 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
-                      <span>Save Changes</span>
+                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                   </div>
                 </div>
@@ -352,7 +567,7 @@ const SettingsPage = () => {
                     <div>
                       <label className="form-label">Language</label>
                       <select
-                        value={settings.language}
+                        value={formData.language}
                         onChange={(e) => handleInputChange('language', e.target.value)}
                         className="form-input"
                       >
@@ -365,14 +580,15 @@ const SettingsPage = () => {
                     <div>
                       <label className="form-label">Timezone</label>
                       <select
-                        value={settings.timezone}
+                        value={formData.timezone}
                         onChange={(e) => handleInputChange('timezone', e.target.value)}
                         className="form-input"
                       >
                         <option value="UTC">UTC</option>
-                        <option value="EST">Eastern Time</option>
-                        <option value="PST">Pacific Time</option>
-                        <option value="CST">Central Time</option>
+                        <option value="EST">Eastern Time (EST)</option>
+                        <option value="PST">Pacific Time (PST)</option>
+                        <option value="CST">Central Time (CST)</option>
+                        <option value="MST">Mountain Time (MST)</option>
                       </select>
                     </div>
                     <div>
@@ -381,7 +597,7 @@ const SettingsPage = () => {
                         <button
                           onClick={() => handleInputChange('theme', 'light')}
                           className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-colors ${
-                            settings.theme === 'light'
+                            formData.theme === 'light'
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
@@ -392,7 +608,7 @@ const SettingsPage = () => {
                         <button
                           onClick={() => handleInputChange('theme', 'dark')}
                           className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-colors ${
-                            settings.theme === 'dark'
+                            formData.theme === 'dark'
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
@@ -405,11 +621,12 @@ const SettingsPage = () => {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => handleSave('Preferences')}
-                      className="btn-primary flex items-center space-x-2"
+                      onClick={handleSavePreferences}
+                      disabled={loading}
+                      className="btn-primary flex items-center space-x-2 disabled:opacity-50"
                     >
                       <Save className="h-4 w-4" />
-                      <span>Save Changes</span>
+                      <span>{loading ? 'Saving...' : 'Save Changes'}</span>
                     </button>
                   </div>
                 </div>
@@ -418,6 +635,36 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center space-x-3 text-red-600 mb-4">
+              <AlertTriangle className="h-6 w-6" />
+              <h3 className="text-lg font-semibold">Delete Account</h3>
+            </div>
+            <p className="text-text-secondary mb-4">
+              Are you sure you want to delete your account? This action cannot be undone.
+              All your data will be permanently deleted within 30 days.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

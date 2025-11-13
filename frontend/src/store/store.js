@@ -12,6 +12,7 @@ import authSlice from './slices/authSlice'
 import appointmentSlice from './slices/appointmentSlice'
 import doctorSlice from './slices/doctorSlice'
 import patientSlice from './slices/patientSlice'
+import settingsSlice from './slices/settingsSlice'
 import uiSlice from './slices/uiSlice'
 
 // Configure the Redux store
@@ -21,6 +22,7 @@ export const store = configureStore({
     appointments: appointmentSlice,
     doctors: doctorSlice,
     patients: patientSlice,
+    settings: settingsSlice,
     ui: uiSlice,
   },
   middleware: (getDefaultMiddleware) =>

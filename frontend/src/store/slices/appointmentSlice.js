@@ -78,6 +78,40 @@ export const fetchAppointmentById = createAsyncThunk(
 )
 
 /**
+ * Cancel an appointment
+ */
+export const cancelAppointment = createAsyncThunk(
+  'appointments/cancel',
+  async ({ id, reason }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentService.cancelAppointment(id, reason)
+      return response.appointment
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to cancel appointment'
+      toast.error(message)
+      return rejectWithValue(message)
+    }
+  }
+)
+
+/**
+ * Reschedule an appointment
+ */
+export const rescheduleAppointment = createAsyncThunk(
+  'appointments/reschedule',
+  async ({ id, appointmentDate, appointmentTime }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentService.rescheduleAppointment(id, { appointmentDate, appointmentTime })
+      return response.appointment
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to reschedule appointment'
+      toast.error(message)
+      return rejectWithValue(message)
+    }
+  }
+)
+
+/**
  * Update appointment (reschedule, add notes, etc.)
  */
 export const updateAppointment = createAsyncThunk(
@@ -89,24 +123,6 @@ export const updateAppointment = createAsyncThunk(
       return response.appointment
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update appointment'
-      toast.error(message)
-      return rejectWithValue(message)
-    }
-  }
-)
-
-/**
- * Cancel appointment
- */
-export const cancelAppointment = createAsyncThunk(
-  'appointments/cancel',
-  async ({ appointmentId, cancellationReason }, { rejectWithValue }) => {
-    try {
-      const response = await appointmentService.cancelAppointment(appointmentId, cancellationReason)
-      toast.success('Appointment cancelled successfully')
-      return response.appointment
-    } catch (error) {
-      const message = error.response?.data?.message || 'Failed to cancel appointment'
       toast.error(message)
       return rejectWithValue(message)
     }
@@ -257,6 +273,28 @@ const appointmentSlice = createSlice({
         state.error = null
       })
       .addCase(cancelAppointment.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload
+      })
+      
+      // Reschedule appointment
+      .addCase(rescheduleAppointment.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(rescheduleAppointment.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.currentAppointment = action.payload
+        
+        // Update in appointments list if present
+        const index = state.appointments.findIndex(apt => apt.id === action.payload.id)
+        if (index !== -1) {
+          state.appointments[index] = action.payload
+        }
+        
+        state.error = null
+      })
+      .addCase(rescheduleAppointment.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload
       })

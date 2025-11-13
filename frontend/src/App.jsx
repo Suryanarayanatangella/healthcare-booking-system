@@ -9,6 +9,9 @@ import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
+// Import contexts
+import { ThemeProvider } from './contexts/ThemeContext'
+
 // Import components
 import Navbar from './components/layout/Navbar'
 import Sidebar from './components/layout/Sidebar'
@@ -64,21 +67,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light">
-      {/* Navigation */}
-      <Navbar />
-      
-      <div className="flex">
-        {/* Sidebar - only show when authenticated */}
-        {isAuthenticated && (
-          <div className="hidden lg:block">
-            <Sidebar />
-          </div>
-        )}
+    <ThemeProvider>
+      <div className="min-h-screen bg-background-light dark:bg-gray-900 transition-colors duration-200">
+        {/* Navigation */}
+        <Navbar />
         
-        {/* Main content */}
-        <main className={`flex-1 ${isAuthenticated ? 'lg:ml-64' : ''}`}>
-          <div className="min-h-screen">
+        <div className="flex">
+          {/* Sidebar - only show when authenticated */}
+          {isAuthenticated && (
+            <div className="hidden lg:block">
+              <Sidebar />
+            </div>
+          )}
+          
+          {/* Main content */}
+          <main className={`flex-1 ${isAuthenticated ? 'lg:ml-64' : ''}`}>
+            <div className="min-h-screen">
             <Routes>
               {/* Public routes */}
               <Route 
@@ -222,6 +226,7 @@ function App() {
         </main>
       </div>
     </div>
+    </ThemeProvider>
   )
 }
 
