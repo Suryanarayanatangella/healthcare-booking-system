@@ -13,6 +13,7 @@ const authService = {
    * @param {Object} userData - User registration data
    * @returns {Promise} API response
    */
+  
   register: async (userData) => {
     const response = await post('/auth/register', userData)
     return response.data

@@ -17,6 +17,7 @@ const authenticateToken = async (req, res, next) => {
     // Get token from Authorization header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    console.log(token)
 
     if (!token) {
       return res.status(401).json({
@@ -27,7 +28,7 @@ const authenticateToken = async (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+    console.log(decoded)
     // Get user details from database
     const userResult = await query(
       'SELECT id, email, first_name, last_name, role, is_active FROM users WHERE id = $1',

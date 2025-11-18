@@ -69,7 +69,10 @@ const demoUsers = [
     email: 'patient@demo.com',
     firstName: 'John',
     lastName: 'Doe',
-    role: 'patient'
+    role: 'patient',
+    height: 167,
+    bloodGroup : 'O+',
+    weight: 81,
   },
   {
     id: '2',
@@ -204,6 +207,9 @@ app.post('/api/auth/register', (req, res) => {
     firstName, 
     lastName, 
     role, 
+    height,
+    bloodGroup,
+    weight,
     specialization, 
     licenseNumber, 
     yearsOfExperience, 
@@ -228,7 +234,10 @@ app.post('/api/auth/register', (req, res) => {
     email,
     firstName,
     lastName,
-    role: role || 'patient'
+    role: role || 'patient',
+    height,
+    bloodGroup,
+    weight,
   };
   
   demoUsers.push(newUser);

@@ -26,7 +26,7 @@ const { authenticateToken } = require('./middleware/auth');
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Security middleware
 app.use(helmet());
@@ -44,9 +44,9 @@ app.use(limiter);
 // CORS configuration
 // Build allowed origins list
 const allowedOrigins = [
-  'http://localhost:3000',
+  'http://localhost:3001',
   'http://localhost:5173', // Vite default port
-  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
   'http://127.0.0.1:5173',
 ];
 

@@ -73,6 +73,9 @@ router.post('/register', async (req, res) => {
       dateOfBirth,
       gender,
       address,
+      bloodGroup,
+      height,
+      weight,
       emergencyContactName,
       emergencyContactPhone,
       specialization,
@@ -115,8 +118,11 @@ router.post('/register', async (req, res) => {
         dateOfBirth,
         gender,
         address,
+        bloodGroup,
+        height,
+        weight,
         emergencyContactName,
-        emergencyContactPhone
+        emergencyContactPhone,
       };
       await database.createPatient(patientData);
     } else if (role === 'doctor') {
@@ -252,7 +258,7 @@ router.get('/me', authenticateToken, async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
       }
     });
 
@@ -274,6 +280,145 @@ router.post('/logout', authenticateToken, (req, res) => {
   res.json({
     message: 'Logout successful'
   });
+});
+/**
+ * @route   POST /api/auth/register/patient
+ * @desc    Register a new patient with medical information
+ * @access  Public
+ */
+router.post('/register/patient', async (req, res, next) => {
+  try {
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      phone,
+      dateOfBirth,
+      gender,
+      address,
+      emergencyContactName,
+      emergencyContactPhone,
+      emergencyContactRelationship,
+      // Medical fields
+      bloodGroup,
+      height,
+      weight,
+      bloodPressure,
+      allergies,
+      currentMedications,
+      pastMedicalHistory,
+      familyMedicalHistory,
+      smoking,
+      alcohol,
+      exercise,
+      diet
+    } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !firstName || !lastName) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'Email, password, first name, and last name are required'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({
+        error: 'User already exists',
+        message: 'A user with this email already exists'
+      });
+    }
+
+    // Start transaction
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Create user
+      const userResult = await client.query(
+        `INSERT INTO users (email, password_hash, first_name, last_name, phone, role)
+         VALUES ($1, $2, $3, $4, $5, 'patient')
+         RETURNING id`,
+        [email, await bcrypt.hash(password, 12), firstName, lastName, phone]
+      );
+
+      const userId = userResult.rows[0].id;
+
+      // Calculate BMI
+      let bmi = null;
+      if (height && weight) {
+        const heightInMeters = height / 100;
+        bmi = Math.round((weight / (heightInMeters * heightInMeters)) * 100) / 100;
+      }
+
+      // Create patient record with all medical information
+      const patientResult = await client.query(
+        `INSERT INTO patients (
+          user_id, date_of_birth, gender, address, 
+          emergency_contact_name, emergency_contact_phone, emergency_contact_relationship,
+          blood_group, height_cm, weight_kg, bmi, blood_pressure,
+          allergies, current_medications, past_medical_history, family_medical_history,
+          smoking, alcohol, exercise, diet
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+        RETURNING id`,
+        [
+          userId, dateOfBirth, gender, address,
+          emergencyContactName, emergencyContactPhone, emergencyContactRelationship,
+          bloodGroup, height, weight, bmi, bloodPressure,
+          allergies, currentMedications, pastMedicalHistory, familyMedicalHistory,
+          smoking, alcohol, exercise, diet
+        ]
+      );
+
+      await client.query('COMMIT');
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: userId, email: email, role: 'patient' },
+        process.env.JWT_SECRET || 'fallback-secret',
+        { expiresIn: '24h' }
+      );
+
+      res.status(201).json({
+        message: 'Patient registered successfully',
+        token: token,
+        user: {
+          id: userId,
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          role: 'patient'
+        },
+        patient: {
+          id: patientResult.rows[0].id,
+          bloodGroup: bloodGroup,
+          height: height,
+          weight: weight,
+          bmi: bmi
+        }
+      });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error('Patient registration error:', error);
+    res.status(500).json({
+      error: 'Registration failed',
+      message: 'Error creating patient account'
+    });
+  }
 });
 
 module.exports = router;
